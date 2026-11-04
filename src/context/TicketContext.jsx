@@ -5,37 +5,33 @@ const TicketContext = createContext();
 export function TicketProvider({ children }) {
     const [tickets, setTickets] = useState([]);
 
-    // Menambahkan ticket
     const addTicket = (ticket) => {
-        setTickets((previousTickets) => [
-            ...previousTickets,
-            {
-                ...ticket,
-                id: Date.now(),
-                ticketNumber: `HD-${String(
-                    previousTickets.length + 1
-                ).padStart(3, "0")}`,
-                status: "Open",
-                createdAt: new Date().toLocaleString("id-ID"),
-            },
-        ]);
+        const newTicket = {
+            ...ticket,
+            id: Date.now(),
+            status: "Open",
+            createdAt: new Date().toLocaleString()
+        };
+
+        setTickets((prev) => [...prev, newTicket]);
     };
 
-    // Mengubah status ticket
     const updateTicketStatus = (id, status) => {
-        setTickets((previousTickets) =>
-            previousTickets.map((ticket) =>
+        setTickets((prev) =>
+            prev.map((ticket) =>
                 ticket.id === id
-                    ? {
-                        ...ticket,
-                        status,
-                    }
+                    ? { ...ticket, status }
                     : ticket
             )
         );
     };
 
-    // Menghapus seluruh ticket
+    const deleteTicket = (id) => {
+        setTickets((prev) =>
+            prev.filter((ticket) => ticket.id !== id)
+        );
+    };
+
     const clearTickets = () => {
         setTickets([]);
     };
@@ -46,7 +42,8 @@ export function TicketProvider({ children }) {
                 tickets,
                 addTicket,
                 updateTicketStatus,
-                clearTickets,
+                deleteTicket,
+                clearTickets
             }}
         >
             {children}

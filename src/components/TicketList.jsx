@@ -5,25 +5,19 @@ function TicketList() {
     const {
         tickets,
         updateTicketStatus,
+        deleteTicket,
         clearTickets
     } = useTicket();
 
     const [search, setSearch] = useState("");
     const [categoryFilter, setCategoryFilter] = useState("");
     const [statusFilter, setStatusFilter] = useState("");
+    const [priorityFilter, setPriorityFilter] = useState("");
 
-    const categories = [
-        ...new Set(
-            tickets.map((ticket) => ticket.category)
-        )
-    ];
-
-    // Filter ticket
     const filteredTickets = tickets.filter((ticket) => {
-
-        const matchSearch = ticket.title
-            .toLowerCase()
-            .includes(search.toLowerCase());
+        const matchSearch =
+            ticket.title.toLowerCase().includes(search.toLowerCase()) ||
+            ticket.name.toLowerCase().includes(search.toLowerCase());
 
         const matchCategory =
             categoryFilter === "" ||
@@ -33,206 +27,128 @@ function TicketList() {
             statusFilter === "" ||
             ticket.status === statusFilter;
 
-        return matchSearch && matchCategory && matchStatus;
+        const matchPriority =
+            priorityFilter === "" ||
+            ticket.priority === priorityFilter;
+
+        return (
+            matchSearch &&
+            matchCategory &&
+            matchStatus &&
+            matchPriority
+        );
     });
 
-    // Warna badge prioritas
-    const priorityBadge = (priority) => {
-        switch (priority) {
-            case "High":
-                return "bg-danger";
-
-            case "Medium":
-                return "bg-warning text-dark";
-
-            case "Low":
-                return "bg-success";
-
-            default:
-                return "bg-secondary";
-        }
-    };
-
-    // Warna badge status
-    const statusBadge = (status) => {
-        switch (status) {
-            case "Open":
-                return "bg-danger";
-
-            case "In Progress":
-                return "bg-warning text-dark";
-
-            case "Resolved":
-                return "bg-success";
-
-            default:
-                return "bg-secondary";
-        }
-    };
-
     return (
-        <div className="card shadow-sm">
-
-            <div className="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-
+        <div className="card shadow-sm mb-4">
+            <div className="card-header d-flex justify-content-between align-items-center">
                 <h5 className="mb-0">Ticket List</h5>
 
-                {tickets.length > 0 && (
-                    <button
-                        className="btn btn-sm btn-danger"
-                        onClick={clearTickets}
-                    >
-                        Clear All
-                    </button>
-                )}
-
+                <button
+                    className="btn btn-danger btn-sm"
+                    onClick={() => {
+                        if (window.confirm("Hapus semua ticket?")) {
+                            clearTickets();
+                        }
+                    }}
+                >
+                    Clear All
+                </button>
             </div>
 
             <div className="card-body">
-
-                {/* SEARCH DAN FILTER */}
-
-                <div className="row g-2 mb-3">
-
-                    <div className="col-md-5">
+                <div className="row mb-3">
+                    <div className="col-md-3 mb-2">
                         <input
                             type="text"
                             className="form-control"
-                            placeholder="Cari berdasarkan judul..."
+                            placeholder="Cari ticket..."
                             value={search}
-                            onChange={(event) =>
-                                setSearch(event.target.value)
-                            }
+                            onChange={(e) => setSearch(e.target.value)}
                         />
                     </div>
 
-                    <div className="col-md-4">
+                    <div className="col-md-3 mb-2">
                         <select
                             className="form-select"
                             value={categoryFilter}
-                            onChange={(event) =>
-                                setCategoryFilter(event.target.value)
+                            onChange={(e) =>
+                                setCategoryFilter(e.target.value)
                             }
                         >
                             <option value="">Semua Kategori</option>
-
-                            {categories.map((category) => (
-                                <option
-                                    key={category}
-                                    value={category}
-                                >
-                                    {category}
-                                </option>
-                            ))}
-
+                            <option value="Hardware">Hardware</option>
+                            <option value="Software">Software</option>
+                            <option value="Network">Network</option>
+                            <option value="Account">Account</option>
+                            <option value="Security">Security</option>
                         </select>
                     </div>
 
-                    <div className="col-md-3">
+                    <div className="col-md-3 mb-2">
                         <select
                             className="form-select"
                             value={statusFilter}
-                            onChange={(event) =>
-                                setStatusFilter(event.target.value)
+                            onChange={(e) =>
+                                setStatusFilter(e.target.value)
                             }
                         >
                             <option value="">Semua Status</option>
                             <option value="Open">Open</option>
-                            <option value="In Progress">
-                                In Progress
-                            </option>
-                            <option value="Resolved">
-                                Resolved
-                            </option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Resolved">Resolved</option>
                         </select>
                     </div>
 
+                    <div className="col-md-3 mb-2">
+                        <select
+                            className="form-select"
+                            value={priorityFilter}
+                            onChange={(e) =>
+                                setPriorityFilter(e.target.value)
+                            }
+                        >
+                            <option value="">Semua Prioritas</option>
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                    </div>
                 </div>
 
-                {/* KONDISI TICKET */}
-
-                {tickets.length === 0 ? (
-                    <div className="alert alert-info">
-                        Belum terdapat service request.
-                    </div>
-
-                ) : filteredTickets.length === 0 ? (
-                    <div className="alert alert-warning">
-                        Ticket tidak ditemukan.
-                    </div>
-
+                {filteredTickets.length === 0 ? (
+                    <p className="text-center text-muted">
+                        Belum ada ticket.
+                    </p>
                 ) : (
-
                     <div className="table-responsive">
-
-                        <table className="table table-hover align-middle">
-
-                            <thead className="table-light">
+                        <table className="table table-bordered table-striped">
+                            <thead>
                                 <tr>
-                                    <th>No. Ticket</th>
-                                    <th>Masalah</th>
+                                    <th>Nama</th>
+                                    <th>Judul</th>
                                     <th>Kategori</th>
                                     <th>Prioritas</th>
                                     <th>Status</th>
-                                    <th>Pelapor</th>
-                                    <th>Action</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
 
                             <tbody>
-
                                 {filteredTickets.map((ticket) => (
-
                                     <tr key={ticket.id}>
-
-                                        <td>
-                                            <strong>
-                                                {ticket.ticketNumber}
-                                            </strong>
-                                        </td>
-
-                                        <td>
-                                            <strong>
-                                                {ticket.title}
-                                            </strong>
-
-                                            <div className="small text-muted">
-                                                {ticket.description}
-                                            </div>
-                                        </td>
-
-                                        <td>
-                                            {ticket.category}
-                                        </td>
-
-                                        <td>
-                                            <span className={`badge ${priorityBadge(ticket.priority)}`}>
-                                                {ticket.priority}
-                                            </span>
-                                        </td>
-
-                                        <td>
-                                            <span className={`badge ${statusBadge(ticket.status)}`}>
-                                                {ticket.status}
-                                            </span>
-                                        </td>
-
-                                        <td>
-                                            {ticket.name}
-
-                                            <div className="small text-muted">
-                                                {ticket.email}
-                                            </div>
-                                        </td>
-
+                                        <td>{ticket.name}</td>
+                                        <td>{ticket.title}</td>
+                                        <td>{ticket.category}</td>
+                                        <td>{ticket.priority}</td>
                                         <td>
                                             <select
-                                                className="form-select form-select-sm"
+                                                className="form-select"
                                                 value={ticket.status}
-                                                onChange={(event) =>
+                                                onChange={(e) =>
                                                     updateTicketStatus(
                                                         ticket.id,
-                                                        event.target.value
+                                                        e.target.value
                                                     )
                                                 }
                                             >
@@ -247,24 +163,26 @@ function TicketList() {
                                                 <option value="Resolved">
                                                     Resolved
                                                 </option>
-
                                             </select>
                                         </td>
 
+                                        <td>
+                                            <button
+                                                className="btn btn-danger btn-sm"
+                                                onClick={() =>
+                                                    deleteTicket(ticket.id)
+                                                }
+                                            >
+                                                Delete
+                                            </button>
+                                        </td>
                                     </tr>
-
                                 ))}
-
                             </tbody>
-
                         </table>
-
                     </div>
-
                 )}
-
             </div>
-
         </div>
     );
 }

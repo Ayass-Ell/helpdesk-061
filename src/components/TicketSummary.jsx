@@ -18,44 +18,42 @@ function TicketSummary() {
     ).length;
 
     return (
-        <div className="row g-3 mb-4">
-
-            <div className="col-md-3">
-                <div className="card shadow-sm text-center">
+        <div className="row mb-4">
+            <div className="col-md-3 mb-3">
+                <div className="card text-center shadow-sm">
                     <div className="card-body">
-                        <h6 className="text-muted">Total Ticket</h6>
+                        <h6>Total Tickets</h6>
                         <h2>{total}</h2>
                     </div>
                 </div>
             </div>
 
-            <div className="col-md-3">
-                <div className="card shadow-sm text-center">
+            <div className="col-md-3 mb-3">
+                <div className="card text-center shadow-sm">
                     <div className="card-body">
-                        <h6 className="text-muted">Open</h6>
+                        <h6>Open</h6>
                         <h2>{open}</h2>
                     </div>
                 </div>
             </div>
 
-            <div className="col-md-3">
-                <div className="card shadow-sm text-center">
+            <div className="col-md-3 mb-3">
+                <div className="card text-center shadow-sm">
                     <div className="card-body">
-                        <h6 className="text-muted">In Progress</h6>
+                        <h6>In Progress</h6>
                         <h2>{progress}</h2>
                     </div>
                 </div>
             </div>
 
-            <div className="col-md-3">
-                <div className="card shadow-sm text-center">
+            <div className="col-md-3 mb-3">
+                <div className="card text-center shadow-sm">
                     <div className="card-body">
-                        <h6 className="text-muted">Resolved</h6>
+                        <h6>Resolved</h6>
                         <h2>{resolved}</h2>
                     </div>
                 </div>
             </div>
-
         </div>
     );
 }
